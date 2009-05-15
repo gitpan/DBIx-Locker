@@ -1,4 +1,7 @@
 Revision history for DBIx-Locker
 
-0.091340  2009-05-14 02:43:01 UTC
+0.091350  2009-05-15 12:27:49 UTC
+          add sqlite prereq
+
+0.091340
           first release to the CPAN

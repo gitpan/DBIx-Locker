@@ -3,7 +3,7 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-our $VERSION = '0.091340';
+our $VERSION = '0.091350';
 
 # ABSTRACT: locks for db resources that might not be totally insane
 
@@ -136,7 +136,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.091340
+version 0.091350
 
 =head1 DESCRIPTION
 
