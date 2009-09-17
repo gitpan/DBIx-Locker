@@ -3,7 +3,7 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-our $VERSION = '0.091350';
+our $VERSION = '0.092600';
 
 # ABSTRACT: locks for db resources that might not be totally insane
 
@@ -136,7 +136,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.091350
+version 0.092600
 
 =head1 DESCRIPTION
 
@@ -162,15 +162,15 @@ I<keep looking>.
 
 =head2 new
 
-    my $locker = DBIx::Locker->new(\%arg);
+  my $locker = DBIx::Locker->new(\%arg);
 
 This returns a new locker. 
 
 Valid arguments are:
 
-    dbh      - a database handle to use for locking
-    dbi_args - an arrayref of args to pass to DBI->connect to reconnect to db
-    table    - the table for locks
+  dbh      - a database handle to use for locking
+  dbi_args - an arrayref of args to pass to DBI->connect to reconnect to db
+  table    - the table for locks
 
 =head2 default_dbi_args
 
@@ -190,7 +190,7 @@ stored.
 
 =head2 lock
 
-    my $lock = $locker->lock($identifier, \%arg);
+  my $lock = $locker->lock($identifier, \%arg);
 
 This method attempts to return a new DBIx::Locker::Lock.
 
@@ -207,7 +207,7 @@ This method deletes expired semaphores.
 This software is copyright (c) 2009 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
-the same terms as perl itself.
+the same terms as the Perl 5 programming language system itself.
 
 =cut 
 

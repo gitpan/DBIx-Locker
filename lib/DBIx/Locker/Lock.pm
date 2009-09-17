@@ -4,8 +4,10 @@ use 5.008;
 # ABSTRACT: a live resource lock
 
 package DBIx::Locker::Lock;
-our $VERSION = '0.091350';
+our $VERSION = '0.092600';
 
+
+use Carp ();
 
 
 sub new {
@@ -23,12 +25,42 @@ sub new {
 
 
 BEGIN {
-  for my $attr (qw(locker lock_id expires locked_by)) {
+  for my $attr (qw(locker lock_id locked_by)) {
     Sub::Install::install_sub({
-      code => sub { $_[0]->{$attr} },
+      code => sub {
+        Carp::confess("$attr is read-only") if @_ > 1;
+        $_[0]->{$attr}
+      },
       as   => $attr,
     });
   }
+}
+
+
+sub expires {
+  my $self = shift;
+  return $self->{expires} unless @_;
+
+  my $new_expiry = shift;
+
+  Carp::confess("new expiry must be a Unix epoch time")
+    unless $new_expiry =~ /\A\d+\z/;
+
+  my $dbh   = $self->locker->dbh;
+  my $table = $self->locker->table;
+
+  my $rows  = $dbh->do(
+    "UPDATE $table SET expires = ? WHERE id = ?",
+    undef,
+    $new_expiry,
+    $self->lock_id,
+  );
+
+  Carp::confess('error updating expiry time') unless $rows == 1;
+
+  $self->{expires} = $new_expiry;
+
+  return $new_expiry;
 }
 
 
@@ -43,7 +75,7 @@ sub unlock {
 
   my $rows = $dbh->do("DELETE FROM $table WHERE id=?", undef, $self->lock_id);
 
-  die('error releasing lock') unless $rows == 1;
+  Carp::confess('error releasing lock') unless $rows == 1;
 }
 
 sub DESTROY {
@@ -65,7 +97,7 @@ DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.091350
+version 0.092600
 
 =head1 METHODS
 
@@ -75,24 +107,34 @@ B<Calling this method is a very, very stupid idea.>  This method is called by
 L<DBIx::Locker> to create locks.  Since you are not a locker, you should not
 call this method.  Seriously.
 
-    my $locker = DBIx::Locker::Lock->new(\%arg);
+  my $locker = DBIx::Locker::Lock->new(\%arg);
 
 This returns a new lock. 
 
-    locker    - the locker creating the lock
-    lock_id   - the id of the lock in the lock table
-    expires   - the time (in epoch seconds) at which the lock will expire
-    locked_by - a hashref of identifying information
+  locker    - the locker creating the lock
+  lock_id   - the id of the lock in the lock table
+  expires   - the time (in epoch seconds) at which the lock will expire
+  locked_by - a hashref of identifying information
 
 =head2 locker
 
 =head2 lock_id
 
-=head2 expires
-
 =head2 locked_by
 
 These are accessors for data supplied to L</new>.
+
+=head2 expires
+
+This method returns the expiration time (as a unix timestamp) as provided to
+L</new> -- unless expiration has been changed.  Expiration can be changed by
+using this method as a mutator:
+
+  # expire one hour from now, no matter what initial expiration was
+  $lock->expired(time + 3600);
+
+When updating the expiration time, if the given expiration time is not a valid
+unix time, or if the expiration cannot be updated, an exception will be raised.
 
 =head2 guid
 
@@ -112,7 +154,7 @@ automatically called when locks are garbage collected.
 This software is copyright (c) 2009 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
-the same terms as perl itself.
+the same terms as the Perl 5 programming language system itself.
 
 =cut 
 

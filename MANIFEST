@@ -1,7 +1,7 @@
 Changes
 LICENSE
 MANIFEST
-META.yml
+META.json
 Makefile.PL
 README
 bin/dbix_locker_purge
@@ -11,3 +11,6 @@ lib/DBIx/Locker/Lock.pm
 sql/mysql.sql
 sql/sqlite.sql
 t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+test.db

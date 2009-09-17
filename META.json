@@ -1,0 +1,27 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/rjbs/dbix-locker/tree"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla::Plugin::MetaJSON version 1.092400",
+   "version" : "0.092600",
+   "name" : "DBIx-Locker",
+   "author" : [
+      "Ricardo SIGNES <rjbs@cpan.org>"
+   ],
+   "license" : "perl",
+   "requires" : {
+      "DBD::SQLite" : "0",
+      "JSON::XS" : "0",
+      "Data::GUID" : "0",
+      "Log::Dispatchouli" : "0",
+      "Sub::Install" : "0",
+      "Getopt::Long::Descriptive" : "0",
+      "Sys::Hostname" : "0",
+      "DBI" : "0"
+   },
+   "abstract" : "locks for db resources that might not be totally insane"
+}
