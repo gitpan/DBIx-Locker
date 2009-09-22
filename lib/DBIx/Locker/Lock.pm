@@ -4,7 +4,7 @@ use 5.008;
 # ABSTRACT: a live resource lock
 
 package DBIx::Locker::Lock;
-our $VERSION = '0.092600';
+our $VERSION = '0.092650';
 
 
 use Carp ();
@@ -46,17 +46,20 @@ sub expires {
   Carp::confess("new expiry must be a Unix epoch time")
     unless $new_expiry =~ /\A\d+\z/;
 
+  my $time_array = [ localtime $new_expiry ];
+
   my $dbh   = $self->locker->dbh;
   my $table = $self->locker->table;
 
   my $rows  = $dbh->do(
     "UPDATE $table SET expires = ? WHERE id = ?",
     undef,
-    $new_expiry,
+    $self->locker->_time_to_string($time_array),
     $self->lock_id,
   );
 
-  Carp::confess('error updating expiry time') unless $rows == 1;
+  my $str = defined $rows ? $rows : 'undef';
+  Carp::confess("error updating expiry: UPDATE returned $str") if $rows != 1;
 
   $self->{expires} = $new_expiry;
 
@@ -97,7 +100,7 @@ DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.092600
+version 0.092650
 
 =head1 METHODS
 

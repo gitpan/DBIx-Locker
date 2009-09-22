@@ -3,10 +3,11 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-our $VERSION = '0.092600';
+our $VERSION = '0.092650';
 
 # ABSTRACT: locks for db resources that might not be totally insane
 
+use Carp ();
 use DBI;
 use Data::GUID ();
 use DBIx::Locker::Lock;
@@ -23,12 +24,27 @@ sub new {
     table    => ($arg->{table}    || $class->default_table),
   };
 
+  Carp::confess("cannot use a dbh without RaiseError")
+    if $guts->{dbh} and not $guts->{dbh}{RaiseError};
+  
+  my $dbi_attr = $guts->{dbi_args}[3] ||= {};
+
+  Carp::confess("RaiseError cannot be disabled")
+    if exists $dbi_attr->{RaiseError} and not $dbi_attr->{RaiseError};
+
+  $dbi_attr->{RaiseError} = 1;
+
   return bless $guts => $class;
 }
 
 
-sub default_dbi_args { X->throw('dbi_args not given and no default defined') }
-sub default_table    { X->throw('table not given and no default defined') }
+sub default_dbi_args {
+  Carp::confess('dbi_args not given and no default defined')
+}
+
+sub default_table    {
+  Carp::Confess('table not given and no default defined')
+}
 
 
 sub dbh {
@@ -102,7 +118,7 @@ sub _time_to_string {
   my ($self, $time) = @_;
 
   $time = [ localtime ] unless $time;
-  return sprintf '%s-%s-%s %s:%s:%s',
+  return sprintf '%04u-%02u-%02u %02u:%02u:%02u',
     $time->[5] + 1900, $time->[4]+1, $time->[3],
     $time->[2], $time->[1], $time->[0];
 }
@@ -136,7 +152,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.092600
+version 0.092650
 
 =head1 DESCRIPTION
 

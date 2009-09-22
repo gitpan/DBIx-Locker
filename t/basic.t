@@ -44,8 +44,11 @@ my $guid;
   $guid = $lock->guid;
 
   eval { $locker->lock('Zombie Soup'); };
-  # isa_ok($@, 'X::Unavailable', "can't lock already-locked resources");
-  ok($@);
+  ok(
+    $@, 
+    # (used to be isa_ok) 'X::Unavailable',
+    "can't lock already-locked resources"
+  );
 }
 
 {
@@ -69,5 +72,9 @@ my $guid;
   my $sth = $dbh->prepare('SELECT expires FROM locks WHERE id = ?');
   $sth->execute($lock->lock_id);
   my ($new_expires) = $sth->fetchrow_array;
-  is($new_expires, $new_expiry, "lock expiry updated correctly in DB");
+  is(
+    $new_expires,
+    $locker->_time_to_string([ localtime $new_expiry ]),
+    "lock expiry updated correctly in DB"
+  );
 }
