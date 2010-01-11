@@ -2,6 +2,7 @@ Changes
 LICENSE
 MANIFEST
 META.json
+META.yml
 Makefile.PL
 README
 bin/dbix_locker_purge
@@ -13,4 +14,3 @@ sql/sqlite.sql
 t/basic.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
-test.db
