@@ -4,7 +4,7 @@ use 5.008;
 # ABSTRACT: a live resource lock
 
 package DBIx::Locker::Lock;
-our $VERSION = '0.100110';
+our $VERSION = '0.100111';
 
 use Carp ();
 
@@ -98,7 +98,7 @@ DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.100110
+version 0.100111
 
 =head1 METHODS
 

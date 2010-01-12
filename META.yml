@@ -20,4 +20,4 @@ requires:
   Sys::Hostname: 0
 resources:
   repository: http://github.com/rjbs/dbix-locker
-version: 0.100110
+version: 0.100111

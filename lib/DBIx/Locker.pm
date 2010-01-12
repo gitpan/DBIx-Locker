@@ -3,7 +3,7 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-our $VERSION = '0.100110';
+our $VERSION = '0.100111';
 # ABSTRACT: locks for db resources that might not be totally insane
 
 use Carp ();
@@ -63,7 +63,7 @@ sub table {
 
 
 my $JSON;
-BEGIN { $JSON = JSON::XS->new->canonical(1)->space_after(1); }
+BEGIN { $JSON = JSON->new->canonical(1)->space_after(1); }
 
 sub lock {
   my ($self, $ident, $arg) = @_;
@@ -150,7 +150,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100110
+version 0.100111
 
 =head1 DESCRIPTION
 

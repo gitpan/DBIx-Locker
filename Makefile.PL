@@ -13,7 +13,7 @@ WriteMakefile(
   NAME      => 'DBIx::Locker',
   AUTHOR    => "Ricardo\ SIGNES\ \<rjbs\@cpan\.org\>",
   ABSTRACT  => "locks\ for\ db\ resources\ that\ might\ not\ be\ totally\ insane",
-  VERSION   => '0.100110',
+  VERSION   => '0.100111',
   EXE_FILES => [ "bin\/dbix_locker_purge" ],
   (eval { ExtUtils::MakeMaker->VERSION(6.31) } ? (LICENSE => 'perl') : ()),
   PREREQ_PM    => {
