@@ -2,33 +2,66 @@
 use strict;
 use warnings;
 
+use 5.008;
+
+use ExtUtils::MakeMaker 6.30;
 
 
-use ExtUtils::MakeMaker 6.11;
 
-
-
-WriteMakefile(
-  DISTNAME  => 'DBIx-Locker',
-  NAME      => 'DBIx::Locker',
-  AUTHOR    => "Ricardo\ SIGNES\ \<rjbs\@cpan\.org\>",
-  ABSTRACT  => "locks\ for\ db\ resources\ that\ might\ not\ be\ totally\ insane",
-  VERSION   => '0.100111',
-  EXE_FILES => [ "bin\/dbix_locker_purge" ],
-  (eval { ExtUtils::MakeMaker->VERSION(6.31) } ? (LICENSE => 'perl') : ()),
-  PREREQ_PM    => {
-    "DBD::SQLite" => '0',
-    "ExtUtils::MakeMaker" => '6.11',
-    "Data::GUID" => '0',
-    "Log::Dispatchouli" => '0',
-    "Sub::Install" => '0',
-    "JSON" => '2',
-    "Getopt::Long::Descriptive" => '0',
-    "Sys::Hostname" => '0',
-    "DBI" => '0',
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "locks for db resources that might not be totally insane",
+  "AUTHOR" => "Ricardo SIGNES <rjbs\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "File::Find" => 0,
+    "File::Temp" => 0,
+    "Test::More" => "0.96"
   },
-  test => {TESTS => 't/*.t'}
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
+  },
+  "DISTNAME" => "DBIx-Locker",
+  "EXE_FILES" => [
+    "bin/dbix_locker_purge"
+  ],
+  "LICENSE" => "perl",
+  "NAME" => "DBIx::Locker",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "DBD::SQLite" => 0,
+    "DBI" => 0,
+    "Data::GUID" => 0,
+    "Getopt::Long::Descriptive" => 0,
+    "JSON" => 2,
+    "Log::Dispatchouli" => 0,
+    "Sub::Install" => 0,
+    "Sys::Hostname" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.100112",
+  "test" => {
+    "TESTS" => "t/*.t"
+  }
 );
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
 
 
 

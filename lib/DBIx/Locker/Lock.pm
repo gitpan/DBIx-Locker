@@ -4,9 +4,12 @@ use 5.008;
 # ABSTRACT: a live resource lock
 
 package DBIx::Locker::Lock;
-our $VERSION = '0.100111';
+{
+  $DBIx::Locker::Lock::VERSION = '0.100112';
+}
 
 use Carp ();
+use Sub::Install ();
 
 
 sub new {
@@ -90,6 +93,7 @@ sub DESTROY {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -98,7 +102,7 @@ DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.100111
+version 0.100112
 
 =head1 METHODS
 
@@ -148,14 +152,13 @@ automatically called when locks are garbage collected.
 
 =head1 AUTHOR
 
-  Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Ricardo SIGNES.
+This software is copyright (c) 2012 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

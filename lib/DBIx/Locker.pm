@@ -3,7 +3,9 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-our $VERSION = '0.100111';
+{
+  $DBIx::Locker::VERSION = '0.100112';
+}
 # ABSTRACT: locks for db resources that might not be totally insane
 
 use Carp ();
@@ -25,7 +27,7 @@ sub new {
 
   Carp::confess("cannot use a dbh without RaiseError")
     if $guts->{dbh} and not $guts->{dbh}{RaiseError};
-  
+
   my $dbi_attr = $guts->{dbi_args}[3] ||= {};
 
   Carp::confess("RaiseError cannot be disabled")
@@ -105,7 +107,7 @@ sub lock {
 
   my $lock = DBIx::Locker::Lock->new({
     locker    => $self,
-    lock_id   => $dbh->last_insert_id(undef, undef, $table, 'id'),
+    lock_id   => $self->last_insert_id,
     expires   => $expires,
     locked_by => $locked_by,
   });
@@ -139,9 +141,15 @@ sub purge_expired_locks {
   );
 }
 
+
+sub last_insert_id {
+   $_[0]->dbh->last_insert_id(undef, undef, $_[0]->table, 'id')
+}
+
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -150,7 +158,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100111
+version 0.100112
 
 =head1 DESCRIPTION
 
@@ -178,7 +186,7 @@ I<keep looking>.
 
   my $locker = DBIx::Locker->new(\%arg);
 
-This returns a new locker. 
+This returns a new locker.
 
 Valid arguments are:
 
@@ -212,16 +220,44 @@ This method attempts to return a new DBIx::Locker::Lock.
 
 This method deletes expired semaphores.
 
+=head2 last_insert_id
+
+This method exists so that subclasses can do something else to support their
+DBD for getting the id of the created lock.  For example, with DBD::ODBC and
+SQL Server it should be:
+
+ sub last_insert_id { ($_[0]->dbh->selectrow_array('SELECT @@IDENTITY'))[0] }
+
+=head1 STORAGE
+
+To use this module you'll need to create the lock table, which should have five
+columns:
+
+=over
+
+=item * C<id> Autoincrementing ID is recommended
+
+=item * C<lockstring> varchar(128) with a unique constraint
+
+=item * C<created> datetime
+
+=item * C<exires> datetime
+
+=item * C<locked_by> text
+
+=back
+
+See the C<sql> directory included in this dist for DDL for your database.
+
 =head1 AUTHOR
 
-  Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Ricardo SIGNES.
+This software is copyright (c) 2012 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
