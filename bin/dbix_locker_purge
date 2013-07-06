@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use 5.008;
-# PODNAME:  dbix_locker_pureg
+# PODNAME:  dbix_locker_purge
 # ABSTRACT: purge old locks
 
 use Getopt::Long::Descriptive;
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-dbix_locker_pureg - purge old locks
+dbix_locker_purge - purge old locks
 
 =head1 VERSION
 
-version 0.100112
+version 0.100113
 
 =head1 AUTHOR
 
@@ -44,7 +44,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Ricardo SIGNES.
+This software is copyright (c) 2013 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
