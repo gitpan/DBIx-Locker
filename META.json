@@ -52,19 +52,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/rjbs/dbix-locker/issues"
+         "web" : "https://github.com/rjbs/DBIx-Locker/issues"
       },
-      "homepage" : "https://github.com/rjbs/dbix-locker",
+      "homepage" : "https://github.com/rjbs/DBIx-Locker",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/rjbs/dbix-locker.git",
-         "web" : "https://github.com/rjbs/dbix-locker"
+         "url" : "https://github.com/rjbs/DBIx-Locker.git",
+         "web" : "https://github.com/rjbs/DBIx-Locker"
       }
    },
-   "version" : "0.100113",
+   "version" : "0.100114",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.019001"
+         "version" : "5.019002"
       },
       "plugins" : [
          {
@@ -206,12 +206,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
             "name" : "@RJBS/PodWeaver",
-            "version" : "3.101641"
+            "version" : "3.101642"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "@RJBS/GithubMeta",
-            "version" : "0.28"
+            "version" : "0.30"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",

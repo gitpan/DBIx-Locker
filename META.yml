@@ -29,13 +29,13 @@ requires:
   strict: 0
   warnings: 0
 resources:
-  bugtracker: https://github.com/rjbs/dbix-locker/issues
-  homepage: https://github.com/rjbs/dbix-locker
-  repository: https://github.com/rjbs/dbix-locker.git
-version: 0.100113
+  bugtracker: https://github.com/rjbs/DBIx-Locker/issues
+  homepage: https://github.com/rjbs/DBIx-Locker
+  repository: https://github.com/rjbs/DBIx-Locker.git
+version: 0.100114
 x_Dist_Zilla:
   perl:
-    version: 5.019001
+    version: 5.019002
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -148,11 +148,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodWeaver
       name: '@RJBS/PodWeaver'
-      version: 3.101641
+      version: 3.101642
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
-      version: 0.28
+      version: 0.30
     -
       class: Dist::Zilla::Plugin::Git::Check
       name: '@RJBS/@Git/Check'

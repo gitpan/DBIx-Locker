@@ -4,7 +4,7 @@ use 5.008;
 
 package DBIx::Locker;
 {
-  $DBIx::Locker::VERSION = '0.100113';
+  $DBIx::Locker::VERSION = '0.100114';
 }
 # ABSTRACT: locks for db resources that might not be totally insane
 
@@ -103,7 +103,13 @@ sub lock {
     $JSON->encode($locked_by),
   );
 
-  die('could not lock resource') unless $rows and $rows == 1;
+  die(
+    "could not lock resource <$ident>" . (
+      $dbh->err && $dbh->errstr
+        ? (': ' .  $dbh->errstr)
+        : ''
+    )
+  ) unless $rows and $rows == 1;
 
   my $lock = DBIx::Locker::Lock->new({
     locker    => $self,
@@ -158,7 +164,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100113
+version 0.100114
 
 =head1 DESCRIPTION
 
