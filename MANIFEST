@@ -12,7 +12,6 @@ lib/DBIx/Locker/Lock.pm
 sql/mssql.sql
 sql/mysql.sql
 sql/sqlite.sql
-t/00-compile.t
 t/000-report-versions-tiny.t
 t/basic.t
 xt/release/changes_has_content.t

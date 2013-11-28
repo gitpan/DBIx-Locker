@@ -30,13 +30,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 dbix_locker_purge - purge old locks
 
 =head1 VERSION
 
-version 0.100114
+version 0.100115
 
 =head1 AUTHOR
 

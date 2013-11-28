@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 17;
 
 use DBI;
 use DBIx::Locker;
@@ -33,6 +33,7 @@ my $guid;
 {
   my $lock = $locker->lock('Zombie Soup');
   isa_ok($lock, 'DBIx::Locker::Lock', 'obtained lock');
+  is($lock->lockstring, 'Zombie Soup', 'lockstring set');
 
   my $id = $lock->lock_id;
   like($id, qr/\A\d+\z/, "we got a numeric lock id");
@@ -49,6 +50,11 @@ my $guid;
     # (used to be isa_ok) 'X::Unavailable',
     "can't lock already-locked resources"
   );
+
+  ok($lock->is_locked, 'lock is active');
+  $lock->unlock;
+  ok(!$lock->is_locked, 'lock is not active');
+  ok(eval { $lock->unlock; 1}, 'unlock twice works');
 }
 
 {
@@ -78,6 +84,7 @@ my $guid;
     "lock expiry updated correctly in DB"
   );
 }
+
 {
   my $lock = $locker->lock('a');
   eval { $locker->lock('a') };

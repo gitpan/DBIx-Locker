@@ -5,7 +5,7 @@ use 5.008;
 
 package DBIx::Locker::Lock;
 {
-  $DBIx::Locker::Lock::VERSION = '0.100114';
+  $DBIx::Locker::Lock::VERSION = '0.100115';
 }
 
 use Carp ();
@@ -16,10 +16,12 @@ sub new {
   my ($class, $arg) = @_;
 
   my $guts = {
+    is_locked => 1,
     locker    => $arg->{locker},
     lock_id   => $arg->{lock_id},
     expires   => $arg->{expires},
     locked_by => $arg->{locked_by},
+    lockstring => $arg->{lockstring},
   };
 
   return bless $guts => $class;
@@ -27,7 +29,7 @@ sub new {
 
 
 BEGIN {
-  for my $attr (qw(locker lock_id locked_by)) {
+  for my $attr (qw(locker lock_id locked_by lockstring)) {
     Sub::Install::install_sub({
       code => sub {
         Carp::confess("$attr is read-only") if @_ > 1;
@@ -72,8 +74,16 @@ sub expires {
 sub guid { $_[0]->locked_by->{guid} }
 
 
+sub is_locked {
+   $_[0]->{is_locked} = $_[1] if exists $_[1];
+   $_[0]->{is_locked}
+}
+
+
 sub unlock {
   my ($self) = @_;
+
+  return unless $self->is_locked;
 
   my $dbh   = $self->locker->dbh;
   my $table = $self->locker->table;
@@ -81,6 +91,7 @@ sub unlock {
   my $rows = $dbh->do("DELETE FROM $table WHERE id=?", undef, $self->lock_id);
 
   Carp::confess('error releasing lock') unless $rows == 1;
+  $self->is_locked(0);
 }
 
 sub DESTROY {
@@ -96,13 +107,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.100114
+version 0.100115
 
 =head1 METHODS
 
@@ -116,16 +129,19 @@ call this method.  Seriously.
 
 This returns a new lock. 
 
-  locker    - the locker creating the lock
-  lock_id   - the id of the lock in the lock table
-  expires   - the time (in epoch seconds) at which the lock will expire
-  locked_by - a hashref of identifying information
+  locker     - the locker creating the lock
+  lock_id    - the id of the lock in the lock table
+  expires    - the time (in epoch seconds) at which the lock will expire
+  locked_by  - a hashref of identifying information
+  lockstring - the string that was locked
 
 =head2 locker
 
 =head2 lock_id
 
 =head2 locked_by
+
+=head2 lockstring
 
 These are accessors for data supplied to L</new>.
 
@@ -144,6 +160,10 @@ unix time, or if the expiration cannot be updated, an exception will be raised.
 =head2 guid
 
 This method returns the lock's globally unique id.
+
+=head2 is_locked
+
+Method to see if the lock is active or not
 
 =head2 unlock
 
