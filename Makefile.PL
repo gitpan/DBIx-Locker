@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.100115",
+  "VERSION" => "0.100116",
   "test" => {
     "TESTS" => "t/*.t"
   }

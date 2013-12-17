@@ -4,7 +4,7 @@ use 5.008;
 
 package DBIx::Locker;
 {
-  $DBIx::Locker::VERSION = '0.100115';
+  $DBIx::Locker::VERSION = '0.100116';
 }
 # ABSTRACT: locks for db resources that might not be totally insane
 
@@ -167,7 +167,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100115
+version 0.100116
 
 =head1 DESCRIPTION
 

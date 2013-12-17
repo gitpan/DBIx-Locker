@@ -38,7 +38,7 @@ dbix_locker_purge - purge old locks
 
 =head1 VERSION
 
-version 0.100115
+version 0.100116
 
 =head1 AUTHOR
 
