@@ -4,13 +4,27 @@ use 5.008;
 # ABSTRACT: a live resource lock
 
 package DBIx::Locker::Lock;
-{
-  $DBIx::Locker::Lock::VERSION = '0.100116';
-}
-
+$DBIx::Locker::Lock::VERSION = '0.100117';
 use Carp ();
 use Sub::Install ();
 
+#pod =method new
+#pod
+#pod B<Calling this method is a very, very stupid idea.>  This method is called by
+#pod L<DBIx::Locker> to create locks.  Since you are not a locker, you should not
+#pod call this method.  Seriously.
+#pod
+#pod   my $locker = DBIx::Locker::Lock->new(\%arg);
+#pod
+#pod This returns a new lock. 
+#pod
+#pod   locker     - the locker creating the lock
+#pod   lock_id    - the id of the lock in the lock table
+#pod   expires    - the time (in epoch seconds) at which the lock will expire
+#pod   locked_by  - a hashref of identifying information
+#pod   lockstring - the string that was locked
+#pod
+#pod =cut
 
 sub new {
   my ($class, $arg) = @_;
@@ -27,6 +41,17 @@ sub new {
   return bless $guts => $class;
 }
 
+#pod =method locker
+#pod
+#pod =method lock_id
+#pod
+#pod =method locked_by
+#pod
+#pod =method lockstring
+#pod
+#pod These are accessors for data supplied to L</new>.
+#pod
+#pod =cut
 
 BEGIN {
   for my $attr (qw(locker lock_id locked_by lockstring)) {
@@ -40,6 +65,19 @@ BEGIN {
   }
 }
 
+#pod =method expires
+#pod
+#pod This method returns the expiration time (as a unix timestamp) as provided to
+#pod L</new> -- unless expiration has been changed.  Expiration can be changed by
+#pod using this method as a mutator:
+#pod
+#pod   # expire one hour from now, no matter what initial expiration was
+#pod   $lock->expired(time + 3600);
+#pod
+#pod When updating the expiration time, if the given expiration time is not a valid
+#pod unix time, or if the expiration cannot be updated, an exception will be raised.
+#pod
+#pod =cut
 
 sub expires {
   my $self = shift;
@@ -70,15 +108,31 @@ sub expires {
   return $new_expiry;
 }
 
+#pod =method guid
+#pod
+#pod This method returns the lock's globally unique id.
+#pod
+#pod =cut
 
 sub guid { $_[0]->locked_by->{guid} }
 
+#pod =method is_locked
+#pod
+#pod Method to see if the lock is active or not
+#pod
+#pod =cut
 
 sub is_locked {
    $_[0]->{is_locked} = $_[1] if exists $_[1];
    $_[0]->{is_locked}
 }
 
+#pod =method unlock
+#pod
+#pod This method unlocks the lock, deleting the semaphor record.  This method is
+#pod automatically called when locks are garbage collected.
+#pod
+#pod =cut
 
 sub unlock {
   my ($self) = @_;
@@ -115,7 +169,7 @@ DBIx::Locker::Lock - a live resource lock
 
 =head1 VERSION
 
-version 0.100116
+version 0.100117
 
 =head1 METHODS
 
@@ -176,7 +230,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2014 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

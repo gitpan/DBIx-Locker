@@ -3,11 +3,8 @@ use warnings;
 use 5.008;
 
 package DBIx::Locker;
-{
-  $DBIx::Locker::VERSION = '0.100116';
-}
 # ABSTRACT: locks for db resources that might not be totally insane
-
+$DBIx::Locker::VERSION = '0.100117';
 use Carp ();
 use DBI;
 use Data::GUID ();
@@ -15,6 +12,60 @@ use DBIx::Locker::Lock;
 use JSON 2 ();
 use Sys::Hostname ();
 
+#pod =head1 DESCRIPTION
+#pod
+#pod ...and a B<warning>.
+#pod
+#pod DBIx::Locker was written to replace some lousy database resource locking code.
+#pod The code would establish a MySQL lock with C<GET_LOCK> to lock arbitrary
+#pod resources.  Unfortunately, the code would also silently reconnect in case of
+#pod database connection failure, silently losing the connection-based lock.
+#pod DBIx::Locker locks by creating a persistent row in a "locks" table.
+#pod
+#pod Because DBIx::Locker locks are stored in a table, they won't go away.  They
+#pod have to be purged regularly.  (A program for doing this, F<dbix_locker_purge>,
+#pod is included.)  The locked resource is just a string.  All records in the lock
+#pod (or semaphore) table are unique on the lock string.
+#pod
+#pod This is the I<entire> mechanism.  This is quick and dirty and quite effective,
+#pod but it's not highly efficient.  If you need high speed locks with multiple
+#pod levels of resolution, or anything other than a quick and brutal solution,
+#pod I<keep looking>.
+#pod
+#pod =head1 STORAGE
+#pod
+#pod To use this module you'll need to create the lock table, which should have five
+#pod columns:
+#pod
+#pod =over
+#pod
+#pod =item * C<id> Autoincrementing ID is recommended
+#pod
+#pod =item * C<lockstring> varchar(128) with a unique constraint
+#pod
+#pod =item * C<created> datetime
+#pod
+#pod =item * C<exires> datetime
+#pod
+#pod =item * C<locked_by> text
+#pod
+#pod =back
+#pod
+#pod See the C<sql> directory included in this dist for DDL for your database.
+#pod
+#pod =method new
+#pod
+#pod   my $locker = DBIx::Locker->new(\%arg);
+#pod
+#pod This returns a new locker.
+#pod
+#pod Valid arguments are:
+#pod
+#pod   dbh      - a database handle to use for locking
+#pod   dbi_args - an arrayref of args to pass to DBI->connect to reconnect to db
+#pod   table    - the table for locks
+#pod
+#pod =cut
 
 sub new {
   my ($class, $arg) = @_;
@@ -38,6 +89,14 @@ sub new {
   return bless $guts => $class;
 }
 
+#pod =method default_dbi_args
+#pod
+#pod =method default_table
+#pod
+#pod These methods may be defined in subclasses to provide defaults to be used when
+#pod constructing a new locker.
+#pod
+#pod =cut
 
 sub default_dbi_args {
   Carp::confess('dbi_args not given and no default defined')
@@ -47,6 +106,11 @@ sub default_table    {
   Carp::Confess('table not given and no default defined')
 }
 
+#pod =method dbh
+#pod
+#pod This method returns the locker's dbh.
+#pod
+#pod =cut
 
 sub dbh {
   my ($self) = @_;
@@ -58,11 +122,24 @@ sub dbh {
   return $self->{dbh} = $dbh;
 }
 
+#pod =method table
+#pod
+#pod This method returns the name of the table in the database in which locks are
+#pod stored.
+#pod
+#pod =cut
 
 sub table {
   return $_[0]->{table}
 }
 
+#pod =method lock
+#pod
+#pod   my $lock = $locker->lock($lockstring, \%arg);
+#pod
+#pod This method attempts to return a new DBIx::Locker::Lock.
+#pod
+#pod =cut
 
 my $JSON;
 BEGIN { $JSON = JSON->new->canonical(1)->space_after(1); }
@@ -131,6 +208,11 @@ sub _time_to_string {
     $time->[2], $time->[1], $time->[0];
 }
 
+#pod =method purge_expired_locks
+#pod
+#pod This method deletes expired semaphores.
+#pod
+#pod =cut
 
 sub purge_expired_locks {
   my ($self) = @_;
@@ -148,6 +230,15 @@ sub purge_expired_locks {
   );
 }
 
+#pod =method last_insert_id
+#pod
+#pod This method exists so that subclasses can do something else to support their
+#pod DBD for getting the id of the created lock.  For example, with DBD::ODBC and
+#pod SQL Server it should be:
+#pod
+#pod  sub last_insert_id { ($_[0]->dbh->selectrow_array('SELECT @@IDENTITY'))[0] }
+#pod
+#pod =cut
 
 sub last_insert_id {
    $_[0]->dbh->last_insert_id(undef, undef, $_[0]->table, 'id')
@@ -167,7 +258,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100116
+version 0.100117
 
 =head1 DESCRIPTION
 
@@ -264,7 +355,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2014 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
